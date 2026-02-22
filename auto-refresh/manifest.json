@@ -1,11 +1,13 @@
 {
   "manifest_version": 3,
   "name": "Auto Refresh",
-  "version": "1.3.4",
+  "version": "1.5.0",
   "description": "自动刷新当前页面",
-  "permissions": ["storage"],
+  "permissions": ["storage", "tabs", "scripting"],
+  "host_permissions": ["<all_urls>"],
   "action": {
-    "default_title": "Auto Refresh"
+    "default_title": "Auto Refresh",
+    "default_popup": "popup.html"
   },
   "background": {
     "service_worker": "background.js"

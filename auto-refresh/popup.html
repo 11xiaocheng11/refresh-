@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>Auto Refresh</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 12px;
+      width: 280px;
+      box-sizing: border-box;
+    }
+    .info {
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+    button {
+      display: block;
+      width: 100%;
+      padding: 8px;
+      margin-top: 8px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="info">IP地址: <span id="ip">加载中...</span></div>
+  <div class="info">页面流量: <span id="traffic">加载中...</span></div>
+  <div class="info">子域名数量: <span id="subdomains">加载中...</span></div>
+
+  <button id="startBtn">开启自动刷新</button>
+  <button id="stopBtn">关闭自动刷新</button>
+  <button id="homepageBtn">访问官网</button>
+
+  <script src="popup.js"></script>
+</body>
+</html>
