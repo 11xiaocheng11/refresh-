@@ -1,4 +1,6 @@
-<img width="200" height="200" alt="Snipaste_2026-02-22_12-26-44" src="https://github.com/user-attachments/assets/59d30bcd-dfb4-4f0c-b872-7b1396d66918" />
+<p align="center">
+<img src="favicon.svg" width="350">
+</p>
 
 Auto Refresh Extension
 
