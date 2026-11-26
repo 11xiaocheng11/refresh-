@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Waterfall Report</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --fg: #000000;
+      --muted: #777;
+      --border: #000000;
+      --card: #ffffff;
+      --bar: #000000;
+      --bar2: #444;
+    }
+
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      background: var(--bg);
+      color: var(--fg);
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      height: 100vh;
+    }
+
+    .left {
+      border-right: 1px solid var(--border);
+      padding: 14px;
+      overflow: auto;
+    }
+
+    .right {
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .top {
+      border-bottom: 1px solid var(--border);
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .title {
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .meta {
+      color: var(--muted);
+      font-size: 12px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 60vw;
+    }
+
+    .card {
+      border: 1px solid var(--border);
+      padding: 10px;
+      margin-bottom: 10px;
+      background: var(--card);
+    }
+
+    .kv {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 6px 10px;
+      font-size: 12px;
+    }
+
+    .k {
+      color: var(--muted);
+    }
+
+    .v {
+      font-weight: 600;
+    }
+
+    .tableWrap {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 420px 1fr;
+      overflow: hidden;
+    }
+
+    .names {
+      overflow: auto;
+      border-right: 1px solid var(--border);
+    }
+
+    .timeline {
+      overflow: auto;
+      position: relative;
+    }
+
+    .row {
+      display: flex;
+      align-items: center;
+      height: 26px;
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+      font-size: 12px;
+      padding: 0 10px;
+      gap: 8px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid var(--border);
+      padding: 1px 6px;
+      font-size: 11px;
+      color: var(--muted);
+      flex: 0 0 auto;
+    }
+
+    .nameText {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      flex: 1;
+    }
+
+    .ms {
+      color: var(--muted);
+      flex: 0 0 auto;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .grid {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .gridLine {
+      position: absolute;
+      top: 0;
+      width: 1px;
+      height: 100%;
+      background: rgba(0,0,0,0.08);
+    }
+
+    .bar {
+      position: absolute;
+      height: 14px;
+      border: 1px solid var(--border);
+      background: var(--bar);
+      box-sizing: border-box;
+      top: 6px;
+    }
+
+    .barInner {
+      height: 100%;
+      width: 30%;
+      background: var(--bar2);
+    }
+
+    .barRow {
+      position: relative;
+      height: 26px;
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+    }
+
+    .empty {
+      padding: 20px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="left">
+      <div class="card">
+        <div class="title" id="reportTitle">Waterfall</div>
+        <div class="meta" id="reportUrl">...</div>
+      </div>
+      <div class="card">
+        <div class="title" style="margin-bottom: 8px;">Summary</div>
+        <div class="kv">
+          <div class="k">TTFB</div><div class="v" id="s-ttfb">-</div>
+          <div class="k">FCP</div><div class="v" id="s-fcp">-</div>
+          <div class="k">LCP</div><div class="v" id="s-lcp">-</div>
+          <div class="k">CLS</div><div class="v" id="s-cls">-</div>
+          <div class="k">DCL</div><div class="v" id="s-dcl">-</div>
+          <div class="k">Requests</div><div class="v" id="s-reqs">-</div>
+          <div class="k">Transfer</div><div class="v" id="s-bytes">-</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="title" style="margin-bottom: 8px;">Controls</div>
+        <div class="kv">
+          <div class="k">Scale</div>
+          <div class="v">
+            <select id="scaleSelect">
+              <option value="0.5">0.5 px/ms</option>
+              <option value="1" selected>1 px/ms</option>
+              <option value="2">2 px/ms</option>
+              <option value="4">4 px/ms</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="right">
+      <div class="top">
+        <div class="title">Resources</div>
+        <div class="meta" id="rangeLabel">...</div>
+      </div>
+      <div class="tableWrap">
+        <div class="names" id="names"></div>
+        <div class="timeline" id="timeline">
+          <div class="grid" id="grid"></div>
+          <div id="bars"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="report.js"></script>
+</body>
+</html>
+
